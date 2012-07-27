@@ -36,6 +36,8 @@ var modList = [ '4e3e08444fe7d0578e07f7ac',
         '4e5a9855a3f75174f2089031',
         '4e08cc79a3f7517d000399e4'];
 
+//var isOn = true;
+
 bot.on('speak', function (data) {
     
    // Get the data
@@ -43,133 +45,174 @@ bot.on('speak', function (data) {
    var text = data.text;
    var userid = data.userid;
   
-   //mod commands
+   //check for mod status
    for (var i=0; i<modList.length; i++) {
        if ( userid == modList[i] ){
-        
-           //add song to queue
-           if (text.match(/^\/snag$/)){
-               bot.roomInfo(true, function(data){
-                   var newSong = data.room.metadata.current_song._id;
-                       bot.playlistAdd(newSong);
-                	   bot.speak( 'jack mode' );
-                       bot.snag();
-                       bot.playlistReorder('default',0,30);
-                       bot.vote('up');
-                });
-            }
-            
-           //room data
-           if (text.match(/^\/data$/)){
-               bot.roomInfo(true, function(data){
-               });
-           }
-           
-           //Spin
-           if (text.match(/^\/spin$/)){
-               bot.addDj();
-           }
-           
-           //Drop
-           if (text.match(/^\/drop$/)){
-               bot.remDj();
-           }
-           
-           //Skip
-           if (text.match(/^\/skip$/)){
-               bot.skip();
-           }
-           
-           //nod
-           if (text.match(/^\/nod$/)){
-               bot.vote('up');
-           }
-           
-           //J lists mod commands
-           if (text.match(/^\/commands$/)){
-                bot.speak('/spin /drop /nod /snag /hunt /dip');
-               }
-           
-           //set avatar
-           if (text.match(/^\/rilla$/)){
-               bot.setAvatar( 23 );
-           }
-        
-           //find new songs
-           if (text.match(/^\/hunt$/)){
-               bot.speak( 'let the hunt begin' );
-               bot.listRooms(0, function(resp){
-                   var added = 0;
-                   var room = resp.rooms;
-                   resp.rooms.forEach(function(room) {
-                       if (room[0].name == 'Hip Hop - We Got It') {
-                       var songId = room[0].metadata.current_song._id;
-                       var songName = room[0].metadata.current_song.metadata.song;
-                       var artist = room[0].metadata.current_song.metadata.artist;
-                       bot.playlistAdd(songId);
-                       bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
-                       bot.playlistReorder('default',0,30);
-                       added++
-                        }
-                        
-                        else if (room[0].name == 'The Real Hip Hop Is Over Here!'){
-                            var songId = room[0].metadata.current_song._id;
-                            var songName = room[0].metadata.current_song.name;
-                            var artist = room[0].metadata.current_song.metadata.artist;
-                             bot.playlistAdd(songId);
-                            bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
-                            bot.playlistReorder('default',0,30);
-                            added++
-                        }
-                        else if (room[0].name == 'Hip Hop : Shaolin Temple'){
-                            var songId = room[0].metadata.current_song._id;
-                            var songName = room[0].metadata.current_song.name;
-                            var artist = room[0].metadata.current_song.metadata.artist;
-                            bot.playlistAdd(songId);
-                            bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
-                            bot.playlistReorder('default',0,30);
-                            added++
-                        }
-                        else if (room[0].name == 'Hip-Hop/Jazz/Soul/Funk/Breaks/Samples'){
-                            var songId = room[0].metadata.current_song._id;
-                            var songName = room[0].metadata.current_song.name;
-                            var artist = room[0].metadata.current_song.metadata.artist;
-                            bot.playlistAdd(songId);
-                            bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
-                            bot.playlistReorder('default',0,30);
-                            added++
-                        }
-                        else{
-                            //console.log('fail');
-                        }
-                   });
-               });
-           }
-           
-       break;
+           var mod = true; 
        }
    }
-    
-    
-       
-   //J lists user commands
-   if (text.match(/^\/commands$/)){
-       bot.speak('/dip');
+   
+   if (text.indexOf('commands') ==0 && mod == true ) {
+       bot.speak('spin, drop, nod, snag, hunt, dip');
    }
    
-   //escort
-   if (text.match(/^\/dip$/)){
-       bot.speak('[pounds chest]');
-       var dropList = [ ];
-       dropList.push(data.userid);
+    if (text.indexOf('commands') ==0 && mod != true ) {
+       bot.speak(' dip');
+   }
+   
+   if (text.indexOf('snag') == 0 && mod == true ){
+       bot.roomInfo(true, function(data){
+           var newSong = data.room.metadata.current_song._id;
+               bot.playlistAdd(newSong);
+               bot.speak( 'jack mode' );
+               bot.snag();
+               //console.log(data.room);
+               bot.playlistReorder('default',0,30);
+               bot.vote('up');
+        });
+   }
+   
+   if (text.indexOf('playlist') == 0 && mod == true){
+       bot.playlistAll(function (data) {
+           console.log(data.list.length)
+           //console.log(data.list)
+       });
+   }
+   
+   //Spin
+   if (text.indexOf("spin") == 0){
+       bot.addDj();
+   }
+   
+   //Drop
+   if (text.indexOf("drop") == 0){
+       bot.remDj();
+   }
+   
+   //Skip
+   if (text.indexOf("skip") == 0){
+       bot.skip();
+   }
+   
+   //nod
+   if (text.indexOf("nod") == 0){
+       bot.vote('up'); 
+   }
+  
 
+   //set avatar
+   if (text.indexOf("rilla up") == 0){
+       bot.setAvatar( 23 );
+   }
+
+ 	//Gorilla facts
+           if (text.indexOf("have a banana") == 0){
+               //bot.speak('random fact')
+               var fs = require('fs');
+               var factsArray = fs.readFileSync('./Gorilla.txt').toString().split("\n");
+               var x = Math.floor((Math.random()*factsArray.length )+1);
+               
+               bot.speak(factsArray[x])    
+           }
+   
+   //find new songs
+   if (text.indexOf("hunt") == 0){
+       bot.speak( 'search' );
+       bot.listRooms(0, function(resp){
+           var added = 0;
+           var room = resp.rooms;
+           resp.rooms.forEach(function(room) {
+               if (room[0].name == 'Hip Hop - We Got It') {
+               var songId = room[0].metadata.current_song._id;
+               var songName = room[0].metadata.current_song.metadata.song;
+               var artist = room[0].metadata.current_song.metadata.artist;
+               bot.playlistAdd(songId);
+               //console.log("Added song: " + songId + " from room " + room[0].name);
+               bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
+               bot.playlistReorder('default',0,30);
+               //console.log(room[0].name);
+               added++
+                }
+                
+                else if (room[0].name == 'The Real Hip Hop Is Over Here!'){
+                    var songId = room[0].metadata.current_song._id;
+                    var songName = room[0].metadata.current_song.name;
+                    var artist = room[0].metadata.current_song.metadata.artist;
+                     bot.playlistAdd(songId);
+                    //console.log("Added song: " + songId + " from room " + room[0].name);
+                    bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
+                    bot.playlistReorder('default',0,30);
+                    //console.log(room[0].name);
+                    added++
+                }
+                else if (room[0].name == 'Hip Hop : Shaolin Temple'){
+                    var songId = room[0].metadata.current_song._id;
+                    var songName = room[0].metadata.current_song.name;
+                    var artist = room[0].metadata.current_song.metadata.artist;
+                    bot.playlistAdd(songId);
+                    //console.log("Added song: " + songId + " from room " + room[0].name);
+                    bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
+                    bot.playlistReorder('default',0,30);
+                    //console.log(room[0].name);
+                    added++
+                }
+                else if (room[0].name == 'Hip-Hop/Jazz/Soul/Funk/Breaks/Samples'){
+                    var currentSong = room[0].metadata.current_song;
+                    if ( currentSong != null ){
+                        var songId = room[0].metadata.current_song._id;
+                        var songName = room[0].metadata.current_song.name;
+                        var artist = room[0].metadata.current_song.metadata.artist;
+                        bot.playlistAdd(songId);
+                        //console.log("Added song: " + songId + " from room " + room[0].name);
+                        bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
+                        bot.playlistReorder('default',0,30);
+                        //console.log(room[0].name);
+                        added++
+                    }
+                }
+                else if (room[0].name == 'Hip Hop Origins'){
+                    var currentSong = room[0].metadata.current_song;
+                    if ( currentSong != null ){
+                        var songId = room[0].metadata.current_song._id;
+                        var songName = room[0].metadata.current_song.name;
+                        var artist = room[0].metadata.current_song.metadata.artist;
+                        bot.playlistAdd(songId);
+                        //console.log("Added song: " + songId + " from room " + room[0].name);
+                        bot.speak("Added song: " + songName + " by " + artist + " from room " + room[0].name);
+                        bot.playlistReorder('default',0,30);
+                        //console.log(room[0].name);
+                        added++
+                    }
+                }
+                else{
+                    //console.log('fail');
+                }
+           });
+       });
+   }
+
+
+   //escort
+   if (text.indexOf("dip") == 0){
+       //var dipDj = data.userid;
+       bot.speak('[pounds chest]');
+       var dropList = [];
+       //var user = data.user[0];
+       //var user = data.name;
+       dropList.push(data.userid);
+       //console.log(data);
+       
+       //console.log(userid);
        bot.on('endsong', function (data) {
            var currentDj = data.room.metadata.current_dj;
+           //console.log(currentDj);
            
            for (var i=0; i<dropList.length; i++){
                if ( currentDj == dropList[i] ) {
+                   //console.log(dropList[i]);
                    bot.remDj(currentDj);
                    delete dropList[ currentDj ];
+                   //console.log(dropList);
                }
            }
        });
@@ -178,18 +221,14 @@ bot.on('speak', function (data) {
            var droppedDj = data.user[0].userid;
            for (var i=0; i<dropList.length; i++){
                if ( droppedDj == dropList[i] ) {
+                   console.log(data.user[0].userid);
+                   //delete dropList[dj];
                    dropList.splice(dropList.indexOf(droppedDj), 1);
+                   console.log(dropList)
                }
            }
        });
    }
-   
-    if (text.match(/^\/data$/)){
-               bot.roomInfo(true, function(data){
-                   var mods = data.room.metadata.moderator_id;
-               console.log(data.room.metadata.djs);
-               });
-           }
 });
 
 //Greet mods
@@ -200,7 +239,7 @@ bot.on('registered', function (data) {
     var name = user.name;
     
     //greet new user
-    setTimeout(10000)
+    //setTimeout(10000)
     
     if (name == 'the unicorn'){
         bot.speak('unicorn power!');
@@ -241,6 +280,9 @@ bot.on('newsong', function (data) {
    var currentSong = room.metadata.current_song._id;
    
    bot.playlistAll( function (data) {
+       //console.log(data);
+       //console.log(data.list[0]._id);
+       //console.log(data.list.length);
        for (var i=0; i<10; i++) {
            if ( currentSong == data.list[i] ) {
                bot.playlistReorder('default',0,data.list.length);
@@ -250,6 +292,7 @@ bot.on('newsong', function (data) {
    
    bot.roomInfo( true , function (data) {
        var numDjs = data.room.metadata.djs.length;
+       //console.log(numDjs);
        
         if ( numDjs < 4 ) {
             bot.addDj();
@@ -268,6 +311,7 @@ bot.on('update_votes', function (data) {
    var downvotes = ( room.metadata.downvotes );
    var percentUp = upvotes / listeners;
    var percentDown = downvotes / listeners;
+   //console.log(data.room.metadata.votelog[0][0]);
    
    //J removes song from playlist
    if ( room.userid == '4fab18d9aaa5cd5942000645' ){
@@ -288,10 +332,17 @@ bot.on('update_votes', function (data) {
 
 //warn user to set avatar to gorilla, if not set by next song J will drop the DJ
 bot.on('add_dj', function (data) {
+     //console.log(data);
      
      if ( data.user[0].avatarid != 23 ){
             bot.speak( data.user[0].name + ' put on your Rilla suit!' )
-            setTimeout(100000)
+            //setTimeout(100000)
             bot.remDj( data.user[0].userid );
         }
     });
+
+//stuff to say to fullhouse:
+//this shit so old jay remembers it coming out
+//this shit so old jay bought the music video on beta
+
+//to do
